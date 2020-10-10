@@ -110,7 +110,7 @@
       apiKey: 'bc58ca6a6f473aba7af114dd19a51c1d',
       indexName: 'gitpage',
       hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"没有找到任何搜索结果: ${query}","hits_stats":"找到约${hits}条结果（用时${time}ms）"}
     }
   };
 </script>
@@ -238,16 +238,6 @@
           </a>
         </li>
       
-        
-        <li class="menu-item menu-item-search">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-search"></i> <br>
-            
-            搜索
-          </a>
-        </li>
-      
 
       
         <li class="menu-item menu-item-search">
@@ -319,7 +309,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kiboroy.github.io/2020/10/10/redis-distributed-locks/">
+    <link itemprop="mainEntityOfPage" href="http://kiboroy.github.io/2019/10/10/redis-distributed-locks/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="kiboroy">
@@ -338,7 +328,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/10/10/redis-distributed-locks/" itemprop="url">分布式锁总结</a></h1>
+                <a class="post-title-link" href="/2019/10/10/redis-distributed-locks/" itemprop="url">分布式锁总结</a></h1>
         
 
         <div class="post-meta">
@@ -350,8 +340,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-10T22:26:50+08:00">
-                2020-10-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T22:26:50+08:00">
+                2019-10-10
               </time>
             
 
@@ -389,12 +379,24 @@
 
       
         
-          
-            
-          
+          <p>1、什么是分布式锁？为什么要用分布式锁？</p>
+<ul>
+<li>服务分布式部署之后，多个实例（Java进程）争抢共享资源（往往这种情况都是非幂等的操作），需要加锁控制，保证同一时间只有一个客户端对共享资源进行操作，保证数据一致。例如，实现商品秒杀的功能时，没有正确对商品数量加锁进行并发控制的话，可能出现商品超卖。</li>
+<li>实现分布式锁需要同时满足四个条件：<ul>
+<li>互斥，同一时刻只能有一个客户端获取到锁。</li>
+<li>不会发生死锁，一个客户端异常导致没有释放锁，其他客户端也要能获取到锁。</li>
+<li>解铃还须系铃人，加锁解锁必须是同一客户端，不能误解了别的客户端加的锁。</li>
+<li>具有容错性，大多数redis节点正常运行，客户端就能获取锁和解锁。
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/10/10/redis-distributed-locks/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
-    </div>
+    </li></ul></li></ul></div>
     
     
     
@@ -508,14 +510,17 @@
 
       
         
-          
-            <p>项目中账单每月扣款要考虑到工作日和休息日，故需要判断某一天是否为工作日或休息日，以及两个出账日之间的工作日间隔。<br>而每年假日办公布的假期是会变化的，通过下面的代码可以灵活获取每年的工作日休息日情况，可以直接使用，或者将数据存入各类数据库以供查询。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!usr/bin/python</span></span><br><span class="line"><span class="comment"># _*_coding:utf-8_*_</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">sys.path.append(<span class="string">".."</span>)</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime, timedelta</span><br><span class="line"><span class="keyword">from</span> dateutil <span class="keyword">import</span> rrule</span><br><span class="line"><span class="keyword">from</span> dateutil.parser <span class="keyword">import</span> parse</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 法定节假日是工作日的日期记录下来， 休息日是工作日的记录下来</span></span><br><span class="line">hoilday_is_work = [<span class="string">'20180101'</span>, <span class="string">'20180215'</span>, <span class="string">'20180216'</span>, <span class="string">'20180219'</span>, <span class="string">'20180220'</span>, <span class="string">'20180221'</span>, <span class="string">'20180405'</span>, <span class="string">'20180406'</span>,</span><br><span class="line">                   <span class="string">'20180430'</span>, <span class="string">'20180501'</span>, <span class="string">'20180618'</span>, <span class="string">'20180924'</span>, <span class="string">'20181001'</span>, <span class="string">'20181002 '</span>, <span class="string">'20181003'</span>, <span class="string">'20181004'</span>,</span><br><span class="line">                   <span class="string">'20181005'</span>]</span><br><span class="line"></span><br><span class="line">week_2_work = [<span class="string">'20180211'</span>, <span class="string">'20180224'</span>, <span class="string">'20180408'</span>, <span class="string">'20180428'</span>, <span class="string">'20180929'</span>, <span class="string">'20180930'</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算两个日期间有多少个工作日</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">workdays</span><span class="params">(start, end, holidays=<span class="number">0</span>, days_off=None)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> days_off <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        days_off = <span class="number">5</span>, <span class="number">6</span></span><br><span class="line">    workdays = [x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">7</span>) <span class="keyword">if</span> x <span class="keyword">not</span> <span class="keyword">in</span> days_off]</span><br><span class="line">    days = rrule.rrule(rrule.DAILY, dtstart=start, until=end, byweekday=workdays)</span><br><span class="line">    <span class="keyword">return</span> days.count() - holidays - <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取月份头尾</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_start_end_month</span><span class="params">(x)</span>:</span></span><br><span class="line">    the_year = datetime.today().strftime(<span class="string">'%Y'</span>)</span><br><span class="line">    <span class="comment"># for x in xrange(1, 13):</span></span><br><span class="line">    <span class="comment">#     dt_start = (datetime(int(the_year), x, 1)).strftime("%Y%m%d")</span></span><br><span class="line">    <span class="comment">#     if 12 == x:</span></span><br><span class="line">    <span class="comment">#         dt_end = (datetime(int(the_year), 12, 31)).strftime("%Y%m%d")</span></span><br><span class="line">    <span class="comment">#     else:</span></span><br><span class="line">    <span class="comment">#         dt_end = (datetime(int(the_year), x+1, 1) - timedelta(days=1)).strftime("%Y%m%d")</span></span><br><span class="line">    <span class="comment">#     print dt_start, dt_end</span></span><br><span class="line">    dt_start = (datetime(int(the_year), x, <span class="number">1</span>)).strftime(<span class="string">"%Y-%m-%d"</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="number">12</span> == x:</span><br><span class="line">        dt_end = (datetime(int(the_year), <span class="number">12</span>, <span class="number">31</span>)).strftime(<span class="string">"%Y-%m-%d"</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        dt_end = (datetime(int(the_year), x+<span class="number">1</span>, <span class="number">1</span>) - timedelta(days=<span class="number">1</span>)).strftime(<span class="string">"%Y-%m-%d"</span>)</span><br><span class="line">    <span class="keyword">return</span> [dt_start, dt_end]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 组合数据</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_data</span><span class="params">(day1, day2)</span>:</span></span><br><span class="line">    day1 = parse(day1)</span><br><span class="line">    day2 = parse(day2)</span><br><span class="line">    hoilday = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range((day2 - day1).days + <span class="number">1</span>):</span><br><span class="line">        singledays = (day1 + timedelta(days=x)).strftime(<span class="string">'%Y%m%d'</span>)</span><br><span class="line">        <span class="keyword">if</span> singledays <span class="keyword">in</span> hoilday_is_work:</span><br><span class="line">            hoilday += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> singledays <span class="keyword">in</span> week_2_work:</span><br><span class="line">            hoilday -= <span class="number">1</span></span><br><span class="line">        <span class="comment"># print(singledays)</span></span><br><span class="line">    period_time = workdays(day1, day2, hoilday)</span><br><span class="line">    print(period_time)</span><br><span class="line">    <span class="keyword">return</span> period_time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        day1 = <span class="string">'20180930'</span></span><br><span class="line">        day2 = <span class="string">'20181010'</span></span><br><span class="line">        gen_data(day1, day2)</span><br><span class="line">    <span class="keyword">except</span> BaseException <span class="keyword">as</span> e:</span><br><span class="line">        print(e)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># debit = 10</span></span><br><span class="line">    <span class="comment"># balance = 28</span></span><br><span class="line">    <span class="comment"># month = 2</span></span><br><span class="line">    <span class="comment"># day1 = parse('201806&#123;&#125;'.format(debit))</span></span><br><span class="line">    <span class="comment"># day2 = parse('201806&#123;&#125;'.format(balance))</span></span><br><span class="line">    <span class="comment"># if balance &gt; debit:</span></span><br><span class="line">    <span class="comment">#     day1 = parse('201807&#123;&#125;'.format(debit))</span></span><br><span class="line">    <span class="comment"># print(day1, day2)</span></span><br><span class="line">    <span class="comment"># period = day1 + relativedelta(months=month)</span></span><br><span class="line">    <span class="comment"># print(period)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># hoilday = 0</span></span><br><span class="line">    <span class="comment"># for x in range((day2 - day1).days + 1):</span></span><br><span class="line">    <span class="comment">#     singledays = (day1 + timedelta(days=x)).strftime('%Y%m%d')</span></span><br><span class="line">    <span class="comment">#     if singledays in hoilday_is_work:</span></span><br><span class="line">    <span class="comment">#         hoilday += 1</span></span><br><span class="line">    <span class="comment">#     if singledays in week_2_work:</span></span><br><span class="line">    <span class="comment">#         hoilday -= 1</span></span><br><span class="line">    <span class="comment">#     print(singledays)</span></span><br><span class="line">    <span class="comment"># period = workdays(day1, day2, hoilday)</span></span><br><span class="line">    <span class="comment"># print(period)</span></span><br></pre></td></tr></table></figure>
-
-          
+          <p>项目中账单每月扣款要考虑到工作日和休息日，故需要判断某一天是否为工作日或休息日，以及两个出账日之间的工作日间隔。<br>而每年假日办公布的假期是会变化的，通过下面的代码可以灵活获取每年的工作日休息日情况，可以直接使用，或者将数据存入各类数据库以供查询。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/05/07/python_working_date/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
-    </div>
+    </p></div>
     
     
     
