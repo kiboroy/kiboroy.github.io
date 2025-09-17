@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Kiboroy's Stack - Sharing in-depth technical articles</title><meta name="author" content="kiboroy,kilimanjaro.roy@gmail.com"><meta name="copyright" content="kiboroy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Code, Cloud, and Curiosity">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kiboroy&#39;s Stack">
+<meta property="og:url" content="http://kiboroy.github.io/index.html">
+<meta property="og:site_name" content="Kiboroy&#39;s Stack">
+<meta property="og:description" content="Code, Cloud, and Curiosity">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://kiboroy.github.io/images/my_avatar.jpeg">
+<meta property="article:author" content="kiboroy">
+<meta property="article:tag" content="Java | Python | AI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://kiboroy.github.io/images/my_avatar.jpeg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Kiboroy's Stack",
+  "alternateName": [
+    "Sharing in-depth technical articles",
+    "kiboroy.github.io"
+  ],
+  "url": "http://kiboroy.github.io/"
+}</script><link rel="shortcut icon" href="/images/snow-mount-line.png"><link rel="canonical" href="http://kiboroy.github.io/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Kiboroy\'s Stack',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'home'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page fixed" id="page-header" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Kiboroy's Stack</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="site-info"><h1 id="site-title">Kiboroy's Stack</h1><div id="site-subtitle"><span id="subtitle"></span></div><div id="site_social_icons"><a class="social-icon" href="https://github.com/kiboroy" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:kilimanjaro.roy@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts nc" id="recent-posts"><div class="recent-post-items"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2023/09/16/003-install-ubuntu-on-laptop/" title="联想G480笔记本电脑安装ubuntu22.04.1LTS">联想G480笔记本电脑安装ubuntu22.04.1LTS</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-09-16T12:13:07.000Z" title="发表于 2023-09-16 20:13:07">2023-09-16</time></span></div><div class="content">1. 安装前准备1.1 笔记本电脑处理 数据无价，切记先将原电脑的重要数据备份好； 笔记本启动时进入bios，将UEFI Boot设置为enable开启； 笔记本磁盘分区改为GPT格式分区；  1.2 准备系统安装U盘 下载系统镜像，最好选择LTS版本，我这里预备安装的是22.04.1LTS，内核版本为5.15，官方将支持到2027年（从22.04.2开始，内核版本就可以开始选装6.1的内核）。 新版本ubuntu镜像可以在https://releases.ubuntu.com/ 下载； 历史版本ubuntu镜像可以在https://old-releases.ubuntu.com/releases/下载； 我这里选择了ubuntu-22.04-live-server-amd64.iso；   下载工具rufus https://rufus.ie/zh，制作启动盘； 选择U盘，选择镜像文件，分区选择GPT，点击开始制作；    2. 开始安装2.1 进入启动 U盘插入笔记本，开机，按F12进入BOOT界面，选择EFI U盘启动盘；  开始启动安装，进入GRUB界面；  （可选）如果...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2020/10/10/002-redis-distributed-locks/" title="分布式锁全面总结（附Redisson源码解析）">分布式锁全面总结（附Redisson源码解析）</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-10-10T14:26:50.000Z" title="发表于 2020-10-10 22:26:50">2020-10-10</time></span></div><div class="content">随着企业软件开发中微服务化不断发展，应用分布式部署如今已是家常便饭，而分布式锁更是个老生常谈的技术话题。笔者发现，目前网上关于分布式锁的文章都不够全面。真实生产环境实现分布式锁是有很多重要的细节点。笔者，参考了一系列文章以及公司本身的生产实践，阐述了分布式锁的实际应用中的要点（包含理论分析与代码实现）。 1、什么是分布式锁？为什么要用分布式锁？ 服务分布式部署之后，多个实例（Java进程）争抢共享资源（往往这种情况都是非幂等的操作），需要加锁控制，保证同一时间只有一个客户端对共享资源进行操作，保证数据一致。例如，商品秒杀时，没有正确对商品数量加锁进行并发控制的话，可能出现商品超卖。  实现分布式锁需要同时满足四个条件：  互斥，同一时刻只能有一个客户端获取到锁。 不会发生死锁，一个客户端异常导致没有释放锁，其他客户端也要能获取到锁。 解铃还须系铃人，加锁解锁必须是同一客户端，不能误解了别的客户端加的锁。 具有容错性，大多数redis节点正常运行，客户端就能获取锁和解锁。        2、如何用redis来实现分布式锁？ 使用redis的setnx（set if not exis...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2019/05/07/001-python-working-date/" title="判断两个日期间差多少个工作日（包含法定假日调休）及某一天是否为工作日（附python代码）">判断两个日期间差多少个工作日（包含法定假日调休）及某一天是否为工作日（附python代码）</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2019-05-07T06:12:32.000Z" title="发表于 2019-05-07 14:12:32">2019-05-07</time></span></div><div class="content">项目中账单每月扣款要考虑到工作日和休息日，故需要判断某一天是否为工作日或休息日，以及两个出账日之间的工作日间隔。而每年假日办公布的假期是会变化的，通过下面的代码可以灵活获取每年的工作日休息日情况，可以直接使用，或者将数据存入各类数据库以供查询。  #!usr/bin/python# _*_coding:utf-8_*_import syssys.path.append(&quot;..&quot;)from datetime import datetime, timedeltafrom dateutil import rrulefrom dateutil.parser import parse# 法定节假日是工作日的日期记录下来， 休息日是工作日的记录下来hoilday_is_work = [&#x27;20180101&#x27;, &#x27;20180215&#x27;, &#x27;20180216&#x27;, &#x27;20180219&#x27;, &#x27;20180220&#x27;, &#x27;20180221&#x27;, &#x27;20180405...</div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">kiboroy</div><div class="author-info-description">Code, Cloud, and Curiosity</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/kiboroy"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/kiboroy" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:kilimanjaro.roy@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">hello world</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/09/16/003-install-ubuntu-on-laptop/" title="联想G480笔记本电脑安装ubuntu22.04.1LTS">联想G480笔记本电脑安装ubuntu22.04.1LTS</a><time datetime="2023-09-16T12:13:07.000Z" title="发表于 2023-09-16 20:13:07">2023-09-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2020/10/10/002-redis-distributed-locks/" title="分布式锁全面总结（附Redisson源码解析）">分布式锁全面总结（附Redisson源码解析）</a><time datetime="2020-10-10T14:26:50.000Z" title="发表于 2020-10-10 22:26:50">2020-10-10</time></div></div></div></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/linux/" style="font-size: 1.1em; color: #999">linux</a> <a href="/tags/java/" style="font-size: 1.1em; color: #999">java</a> <a href="/tags/python/" style="font-size: 1.1em; color: #999">python</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>归档</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2023/09/">
+            <span class="card-archive-list-date">
+              九月 2023
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2020/10/">
+            <span class="card-archive-list-date">
+              十月 2020
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2019/05/">
+            <span class="card-archive-list-date">
+              五月 2019
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div></div></div></main><footer id="footer" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2025 By kiboroy</span></div><div class="footer_custom_text">welcome to my blog</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>window.typedJSFn = {
+  init: str => {
+    window.typed = new Typed('#subtitle', Object.assign({
+      strings: str,
+      startDelay: 300,
+      typeSpeed: 150,
+      loop: true,
+      backSpeed: 50,
+    }, {"loop":false,"startDelay":150,"typeSpeed":75,"backSpeed":50}))
+  },
+  run: subtitleType => {
+    if (true) {
+      if (typeof Typed === 'function') {
+        subtitleType()
+      } else {
+        btf.getScript('https://cdn.jsdelivr.net/npm/typed.js/dist/typed.umd.min.js').then(subtitleType)
+      }
+    } else {
+      subtitleType()
+    }
+  },
+  processSubtitle: (content, extraContents = []) => {
+    if (true) {
+      const sub = ["while ( !succeed ) { try(); }"].slice()
+
+      if (extraContents.length > 0) {
+        sub.unshift(...extraContents)
+      }
+
+      if (typeof content === 'string') {
+        sub.unshift(content)
+      } else if (Array.isArray(content)) {
+        sub.unshift(...content)
+      }
+
+      sub.length > 0 && typedJSFn.init(sub)
+    } else {
+      document.getElementById('subtitle').textContent = typeof content === 'string' ? content :
+        (Array.isArray(content) && content.length > 0 ? content[0] : '')
+    }
+  }
+}
+btf.addGlobalFn('pjaxSendOnce', () => { typed.destroy() }, 'typedDestroy')
+</script><script>function subtitleType () {
+  typedJSFn.processSubtitle(["while ( !succeed ) { try(); }"])
+}
+typedJSFn.run(subtitleType)</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

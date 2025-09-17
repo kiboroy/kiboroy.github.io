@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>联想G480笔记本电脑安装ubuntu22.04.1LTS | Kiboroy's Stack</title><meta name="author" content="kiboroy,kilimanjaro.roy@gmail.com"><meta name="copyright" content="kiboroy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1. 安装前准备1.1 笔记本电脑处理 数据无价，切记先将原电脑的重要数据备份好； 笔记本启动时进入bios，将UEFI Boot设置为enable开启； 笔记本磁盘分区改为GPT格式分区；  1.2 准备系统安装U盘 下载系统镜像，最好选择LTS版本，我这里预备安装的是22.04.1LTS，内核版本为5.15，官方将支持到2027年（从22.04.2开始，内核版本就可以开始选装6.1的内核）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="联想G480笔记本电脑安装ubuntu22.04.1LTS">
+<meta property="og:url" content="http://kiboroy.github.io/2023/09/16/003-install-ubuntu-on-laptop/index.html">
+<meta property="og:site_name" content="Kiboroy&#39;s Stack">
+<meta property="og:description" content="1. 安装前准备1.1 笔记本电脑处理 数据无价，切记先将原电脑的重要数据备份好； 笔记本启动时进入bios，将UEFI Boot设置为enable开启； 笔记本磁盘分区改为GPT格式分区；  1.2 准备系统安装U盘 下载系统镜像，最好选择LTS版本，我这里预备安装的是22.04.1LTS，内核版本为5.15，官方将支持到2027年（从22.04.2开始，内核版本就可以开始选装6.1的内核）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://kiboroy.github.io/images/my_avatar.jpeg">
+<meta property="article:published_time" content="2023-09-16T12:13:07.000Z">
+<meta property="article:modified_time" content="2025-09-17T03:52:32.889Z">
+<meta property="article:author" content="kiboroy">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://kiboroy.github.io/images/my_avatar.jpeg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "联想G480笔记本电脑安装ubuntu22.04.1LTS",
+  "url": "http://kiboroy.github.io/2023/09/16/003-install-ubuntu-on-laptop/",
+  "image": "http://kiboroy.github.io/images/my_avatar.jpeg",
+  "datePublished": "2023-09-16T12:13:07.000Z",
+  "dateModified": "2025-09-17T03:52:32.889Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "kiboroy",
+      "url": "http://kiboroy.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/snow-mount-line.png"><link rel="canonical" href="http://kiboroy.github.io/2023/09/16/003-install-ubuntu-on-laptop/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '联想G480笔记本电脑安装ubuntu22.04.1LTS',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Kiboroy's Stack</span></a><a class="nav-page-title" href="/"><span class="site-name">联想G480笔记本电脑安装ubuntu22.04.1LTS</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">联想G480笔记本电脑安装ubuntu22.04.1LTS</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-09-16T12:13:07.000Z" title="发表于 2023-09-16 20:13:07">2023-09-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-09-17T03:52:32.889Z" title="更新于 2025-09-17 11:52:32">2025-09-17</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="1-安装前准备"><a href="#1-安装前准备" class="headerlink" title="1. 安装前准备"></a>1. 安装前准备</h2><h3 id="1-1-笔记本电脑处理"><a href="#1-1-笔记本电脑处理" class="headerlink" title="1.1 笔记本电脑处理"></a>1.1 笔记本电脑处理</h3><ul>
+<li>数据无价，切记先将原电脑的重要数据备份好；</li>
+<li>笔记本启动时进入bios，将UEFI Boot设置为enable开启；</li>
+<li>笔记本磁盘分区改为GPT格式分区；</li>
+</ul>
+<h3 id="1-2-准备系统安装U盘"><a href="#1-2-准备系统安装U盘" class="headerlink" title="1.2 准备系统安装U盘"></a>1.2 准备系统安装U盘</h3><ol>
+<li>下载系统镜像，最好选择LTS版本，我这里预备安装的是22.04.1LTS，内核版本为5.15，官方将支持到2027年（从22.04.2开始，内核版本就可以开始选装6.1的内核）。<ol>
+<li>新版本ubuntu镜像可以在<code>https://releases.ubuntu.com/</code> 下载；</li>
+<li>历史版本ubuntu镜像可以在<code>https://old-releases.ubuntu.com/releases/</code>下载；</li>
+<li>我这里选择了<code>ubuntu-22.04-live-server-amd64.iso</code>；</li>
+</ol>
+</li>
+<li>下载工具rufus <code>https://rufus.ie/zh</code>，制作启动盘；<ol>
+<li>选择U盘，选择镜像文件，分区选择GPT，点击开始制作；</li>
+</ol>
+</li>
+</ol>
+<h2 id="2-开始安装"><a href="#2-开始安装" class="headerlink" title="2. 开始安装"></a>2. 开始安装</h2><h3 id="2-1-进入启动"><a href="#2-1-进入启动" class="headerlink" title="2.1 进入启动"></a>2.1 进入启动</h3><ol>
+<li><p>U盘插入笔记本，开机，按F12进入BOOT界面，选择EFI U盘启动盘；<br><img src="/2023/09/16/003-install-ubuntu-on-laptop/boot%E7%95%8C%E9%9D%A2.png" alt="boot界面"></p>
+</li>
+<li><p>开始启动安装，进入GRUB界面；<br><img src="/2023/09/16/003-install-ubuntu-on-laptop/grub.png"></p>
+<ol>
+<li>（可选）如果笔记本电脑较老，bios系统可能与安装程序不大适配，可能在安装的最后阶段出现grub安装错误（cannot set efi variables，报错场景参考<code>https://bugs.launchpad.net/ubuntu-desktop-provision/+bug/2065071</code>），导致安装失败，启动后会直接进入一个GRUB命令行界面；<ol>
+<li>为了避免这种情况，可以在GRUB界面直接按<code>e</code>，在<code>linux</code>开头的这一行末尾，加上<code>efi_no_storage_paranoia</code>参数，直接禁用EFI变量的存储检查（解决方案参考<code>https://askubuntu.com/questions/1322437/ubuntu-server-20-04-installation-fails-on-grub-installation-uefi-mode-thinkpad</code>）;<br><img src="/2023/09/16/003-install-ubuntu-on-laptop/grub-e.png"></li>
+<li>输入完成后，直接按F10或者Ctrl x，就会直接启动ubuntu安装了；</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>数据加载完成后，会进入语言选择，键盘选择，这里我都选择了English；</p>
+</li>
+<li><p>接下来是网络设置，我这台笔记本有无线网卡，我选择了wlan，输入wifi名和密码连接了无线网络；</p>
+</li>
+<li><p>再接下来是Configure proxy，配置代理，我这里不配置，直接回车；</p>
+</li>
+<li><p>然后是ubuntu软件安装镜像源配置，Configure Ubuntu archive mirror，我这里配置了阿里云的镜像地址<code>https://mirrors.aliyun.com/ubuntu</code>；</p>
+</li>
+<li><p>再然后是磁盘分区，Guided storage configuration环节，这里我选择Custom storage layout，自定义磁盘分区；</p>
+<ol>
+<li>由于我这台笔记本之前安装过一个ubuntu系统，所以已有磁盘分区信息；<br><img src="/2023/09/16/003-install-ubuntu-on-laptop/disk-partition.png"></li>
+<li>图上有两个硬盘，一个kingston的，一个great wall的，先操作reformat，准备给磁盘重新分区；<br><img src="/2023/09/16/003-install-ubuntu-on-laptop/disk-reformat.png"></li>
+<li>两个硬盘都reformat之后，这里我选择kingston硬盘为启动盘，选择add GPT Patition，先选择swap空间，这里我设置了16G，与内存大小一致，然后会同时带出&#x2F;boot&#x2F;efi；<br><img src="/2023/09/16/003-install-ubuntu-on-laptop/disk-partition-02.png"><br><img src="/2023/09/16/003-install-ubuntu-on-laptop/disk-edit.png"></li>
+<li>edit可以修改分区大小，另一个great wall硬盘我挂载到&#x2F;mnt目录下了，分区完成后选择done，会提示磁盘数据将会被清理，选择continue；</li>
+</ol>
+</li>
+<li><p>接下来设置用户名，主机名和密码；</p>
+</li>
+<li><p>然后确认是否安装openSSH，选择确认，安装上；</p>
+</li>
+<li><p>接下来会开始安装，不出意外install complete，直接reboot就好了；</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://kiboroy.github.io">kiboroy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://kiboroy.github.io/2023/09/16/003-install-ubuntu-on-laptop/">http://kiboroy.github.io/2023/09/16/003-install-ubuntu-on-laptop/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://kiboroy.github.io" target="_blank">Kiboroy's Stack</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/linux/">linux</a></div><div class="post-share"><div class="social-share" data-image="/images/my_avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2020/10/10/002-redis-distributed-locks/" title="分布式锁全面总结（附Redisson源码解析）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">分布式锁全面总结（附Redisson源码解析）</div></div><div class="info-2"><div class="info-item-1">随着企业软件开发中微服务化不断发展，应用分布式部署如今已是家常便饭，而分布式锁更是个老生常谈的技术话题。笔者发现，目前网上关于分布式锁的文章都不够全面。真实生产环境实现分布式锁是有很多重要的细节点。笔者，参考了一系列文章以及公司本身的生产实践，阐述了分布式锁的实际应用中的要点（包含理论分析与代码实现）。 1、什么是分布式锁？为什么要用分布式锁？ 服务分布式部署之后，多个实例（Java进程）争抢共享资源（往往这种情况都是非幂等的操作），需要加锁控制，保证同一时间只有一个客户端对共享资源进行操作，保证数据一致。例如，商品秒杀时，没有正确对商品数量加锁进行并发控制的话，可能出现商品超卖。  实现分布式锁需要同时满足四个条件：  互斥，同一时刻只能有一个客户端获取到锁。 不会发生死锁，一个客户端异常导致没有释放锁，其他客户端也要能获取到锁。 解铃还须系铃人，加锁解锁必须是同一客户端，不能误解了别的客户端加的锁。 具有容错性，大多数redis节点正常运行，客户端就能获取锁和解锁。        2、如何用redis来实现分布式锁？ 使用redis的setnx（set if not exis...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">kiboroy</div><div class="author-info-description">Code, Cloud, and Curiosity</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/kiboroy"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/kiboroy" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:kilimanjaro.roy@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">hello world</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%85%E5%89%8D%E5%87%86%E5%A4%87"><span class="toc-text">1. 安装前准备</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E5%A4%84%E7%90%86"><span class="toc-text">1.1 笔记本电脑处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%87%86%E5%A4%87%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85U%E7%9B%98"><span class="toc-text">1.2 准备系统安装U盘</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85"><span class="toc-text">2. 开始安装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E8%BF%9B%E5%85%A5%E5%90%AF%E5%8A%A8"><span class="toc-text">2.1 进入启动</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/09/16/003-install-ubuntu-on-laptop/" title="联想G480笔记本电脑安装ubuntu22.04.1LTS">联想G480笔记本电脑安装ubuntu22.04.1LTS</a><time datetime="2023-09-16T12:13:07.000Z" title="发表于 2023-09-16 20:13:07">2023-09-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2020/10/10/002-redis-distributed-locks/" title="分布式锁全面总结（附Redisson源码解析）">分布式锁全面总结（附Redisson源码解析）</a><time datetime="2020-10-10T14:26:50.000Z" title="发表于 2020-10-10 22:26:50">2020-10-10</time></div></div></div></div></div></div></main><footer id="footer" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2025 By kiboroy</span></div><div class="footer_custom_text">welcome to my blog</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
