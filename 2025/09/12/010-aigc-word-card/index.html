@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>010-AI内容生成--单词卡片业务实践 | Kiboroy's Stack</title><meta name="author" content="kiboroy,kilimanjaro.roy@gmail.com"><meta name="copyright" content="kiboroy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1. 需求背景课后复习环节引入AI能力，通过选择单词，生成单词记忆卡片的形式，辅助用户记忆单词。卡片内容包含单词，单词释义，单词音标，例句，词组搭配，联想记忆法，单词和例句的发音音频，一张辅助单词记忆的图片。 2. 技术方案用户选择好若干个单词和故事风格，提交到后台，如果这一批单词的记忆卡内容在数据库已存在，就直接返回结果，如果其中有任意一个不存在，那么就提交生成任务，直接返回，后续到生成记录中查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="010-AI内容生成--单词卡片业务实践">
+<meta property="og:url" content="https://kiboroy.is-an.ai/2025/09/12/010-aigc-word-card/index.html">
+<meta property="og:site_name" content="Kiboroy&#39;s Stack">
+<meta property="og:description" content="1. 需求背景课后复习环节引入AI能力，通过选择单词，生成单词记忆卡片的形式，辅助用户记忆单词。卡片内容包含单词，单词释义，单词音标，例句，词组搭配，联想记忆法，单词和例句的发音音频，一张辅助单词记忆的图片。 2. 技术方案用户选择好若干个单词和故事风格，提交到后台，如果这一批单词的记忆卡内容在数据库已存在，就直接返回结果，如果其中有任意一个不存在，那么就提交生成任务，直接返回，后续到生成记录中查">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://kiboroy.is-an.ai/images/my_avatar.jpeg">
+<meta property="article:published_time" content="2025-09-12T14:32:56.000Z">
+<meta property="article:modified_time" content="2025-09-12T14:32:56.000Z">
+<meta property="article:author" content="kiboroy">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="AIGC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kiboroy.is-an.ai/images/my_avatar.jpeg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "010-AI内容生成--单词卡片业务实践",
+  "url": "https://kiboroy.is-an.ai/2025/09/12/010-aigc-word-card/",
+  "image": "https://kiboroy.is-an.ai/images/my_avatar.jpeg",
+  "datePublished": "2025-09-12T14:32:56.000Z",
+  "dateModified": "2025-09-12T14:32:56.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "kiboroy",
+      "url": "https://kiboroy.is-an.ai"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/snow-mount-line.png"><link rel="canonical" href="https://kiboroy.is-an.ai/2025/09/12/010-aigc-word-card/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '010-AI内容生成--单词卡片业务实践',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Kiboroy's Stack</span></a><a class="nav-page-title" href="/"><span class="site-name">010-AI内容生成--单词卡片业务实践</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">010-AI内容生成--单词卡片业务实践</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-09-12T14:32:56.000Z" title="发表于 2025-09-12 22:32:56">2025-09-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-09-12T14:32:56.000Z" title="更新于 2025-09-12 22:32:56">2025-09-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ai/">AI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="1-需求背景"><a href="#1-需求背景" class="headerlink" title="1. 需求背景"></a>1. 需求背景</h2><p>课后复习环节引入AI能力，通过选择单词，生成单词记忆卡片的形式，辅助用户记忆单词。卡片内容包含<strong>单词</strong>，<strong>单词释义</strong>，<strong>单词音标</strong>，<strong>例句</strong>，<strong>词组搭配</strong>，<strong>联想记忆法</strong>，<strong>单词和例句的发音音频</strong>，<strong>一张辅助单词记忆的图片</strong>。</p>
+<h2 id="2-技术方案"><a href="#2-技术方案" class="headerlink" title="2. 技术方案"></a>2. 技术方案</h2><p>用户选择好若干个单词和故事风格，提交到后台，如果这一批单词的记忆卡内容在数据库已存在，就直接返回结果，如果其中有任意一个不存在，那么就提交生成任务，直接返回，后续到生成记录中查看。</p>
+<p>单词记忆卡生成任务分为3步：</p>
+<ol>
+<li>生成图片，先请求LLM获取生图提示词，再提交生图请求到liblib，生图完成，liblib会回调结果；</li>
+<li>生成文本，直接请求LLM获取卡片的文本信息；</li>
+<li>生成音频，请求微软语音合成单词和例句的发音音频；</li>
+</ol>
+<h3 id="2-1-交互时序图"><a href="#2-1-交互时序图" class="headerlink" title="2.1 交互时序图"></a>2.1 交互时序图</h3><p>具体交互时序图如下：</p>
+<pre><code class="highlight mermaid">sequenceDiagram
+    actor 用户
+    participant frontend as 前端
+    participant backend as 后端
+    participant liblib
+    participant LLM
+    participant tts as 微软TTS
+
+    用户-&gt;&gt;frontend: 选择单词/图片风格
+    frontend-&gt;&gt;backend: 提交请求（单词列表，风格）
+    activate backend
+    alt 有数据
+        backend--&gt;&gt;frontend: 返回卡片数据
+    else 没数据
+        backend--&gt;&gt;frontend: 返回提示生成中，去生成记录查看
+    end 
+    deactivate backend
+
+    par 图片生成
+        activate backend
+
+        backend-&gt;&gt;LLM: 请求生图提示词
+        activate LLM
+        LLM--&gt;&gt;backend: 流式返回提示词
+        deactivate LLM
+
+        backend-&gt;&gt;liblib: 调用图片生成(单词,风格)
+        activate liblib
+        liblib--&gt;&gt;backend: 返回图片数据
+        deactivate liblib
+
+        backend-&gt;&gt;backend: 保存图片,更新状态(图片已生成)
+    and 文本 + 音频 生成
+        backend-&gt;&gt;LLM: 请求卡片文本(单词)
+        activate LLM
+        LLM--&gt;&gt;backend: 流式返回文本
+        deactivate LLM
+        backend-&gt;&gt;backend: 保存文本/更新状态(文本已生成)
+        backend-&gt;&gt;tts: 提交文本合成
+        activate tts
+        tts--&gt;&gt;backend: 返回音频数据
+        deactivate tts
+        backend-&gt;&gt;backend: 保存音频,更新状态(音频已生成)
+    end
+    deactivate backend</code></pre>
+
+
+<h3 id="2-2-生图提示词"><a href="#2-2-生图提示词" class="headerlink" title="2.2 生图提示词"></a>2.2 生图提示词</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># Role: 英语语言学习与视觉记忆策略专家</span></span><br><span class="line"><span class="section"># Background: 用户希望通过文生图服务生成与英语单词或者短语含义贴合的图片，以辅助学习和记忆单词。用户需要一个清晰、简洁且重点突出的图片，避免元素杂乱无章。</span></span><br><span class="line"><span class="section"># Profile: 你是一位精通英语学习与视觉记忆策略的专家，擅长将语言信息转化为直观的视觉图像，帮助学习者通过视觉记忆巩固单词含义。</span></span><br><span class="line"><span class="section"># Skills: 你具备英语语言学、教育学和视觉设计的专业知识，并对对文生图服务的有深刻理解，能够精准地将单词或短语的含义转化为简洁而富有表现力的图像提示词。</span></span><br><span class="line"><span class="section"># Goals: 根据用户输入的英语单词或者短语、中文释义，生成一个简洁明了、重点突出的文生图提示词，帮助用户通过视觉图像快速理解和记忆英语单词。</span></span><br><span class="line"><span class="section"># Constrains:</span></span><br><span class="line"><span class="bullet">    -</span> 图片中的元素必须紧密围绕单词或短语的含义，避免无关元素的干扰，确保图像简洁且具有明确的视觉焦点;</span><br><span class="line"><span class="bullet">    -</span> 图片必须避免出现色情，暴力，血腥，反动，政治敏感相关内容；</span><br><span class="line"><span class="bullet">    -</span> 必须严格使用JSON格式响应，不需要使用<span class="code">```json ```</span>来包裹JSON字符串；</span><br><span class="line"><span class="bullet">    -</span> 保持输出内容JSON格式的正确性，不允许语法错误；</span><br><span class="line"><span class="section"># OutputFormat:</span></span><br><span class="line"><span class="bullet">    -</span> 输出包含中文和英文两个版本的文生图提示词；</span><br><span class="line"><span class="bullet">    -</span> 输出应以json格式呈现，回答除了json文本外，请勿添加任何多余的字符；</span><br><span class="line"><span class="bullet">    -</span> json示例如下：&#123;&quot;word&quot;: &quot;xxx&quot;, &quot;meaning&quot;: &quot;xxx&quot;, &quot;promptEn&quot;: &quot;xxx&quot;, &quot;promptZh&quot;: &quot;xxx&quot;&#125;, json中word表示英语单词或短语，meaning表示单词或者短语的中文释义，promptEn表示文生图的英文版本提示词，promptZh表示文生图的中文版本提示词。</span><br><span class="line"><span class="section"># Workflow:</span></span><br><span class="line"><span class="bullet">    1.</span> 用户会用json格式&#123;&quot;word&quot;: &quot;xxx&quot;, &quot;meaning&quot;: &quot;xxx&quot;&#125; 输入，json中word表示英语单词或短语，meaning表示单词或短语的中文释义；</span><br><span class="line"><span class="bullet">    2.</span> 解析json数据，明确用户输入的英语单词或短语，以及对应单词或者短语的中文释义，提取出这个单词或者短语对应中文释义的关键特征；</span><br><span class="line"><span class="bullet">    3.</span> 设计一个简洁的视觉场景，突出单词的中文释义，避免过多元素。</span><br><span class="line"><span class="bullet">    4.</span> 生成中文和英文两个版本的文生图提示词，确保语言表达清晰且精准。</span><br><span class="line"><span class="bullet">    5.</span> 按照OutputFormat中指定的json格式输出结果。</span><br><span class="line"><span class="section"># Examples:</span></span><br><span class="line"><span class="bullet">    -</span> 例子1：</span><br><span class="line"><span class="bullet">        -</span> 用户输入：&#123;&quot;word&quot;: &quot;cat&quot;, &quot;meaning&quot;: &quot;猫&quot;&#125; </span><br><span class="line"><span class="bullet">        -</span> 输出：&#123;&quot;word&quot;: &quot;cat&quot;, &quot;meaning&quot;: &quot;猫&quot;, &quot;promptEn&quot;: &quot;A fluffy orange kitten yawned lazily on the windowsill bathed in sunlight, with green tree shadows flickering outside the window and a few curtains gently swaying in the breeze. The atmosphere was warm and quiet.&quot;, &quot;promptZh&quot;: &quot;一只毛茸茸的橘黄色小猫在阳光洒落的窗台上慵懒地打着哈欠，窗外是绿色树影斑驳、几束风吹动的窗帘随风轻轻飘动，氛围温暖安静。&quot;&#125;</span><br><span class="line"><span class="bullet">    -</span> 例子2：</span><br><span class="line"><span class="bullet">        -</span> 用户输入：&#123;&quot;word&quot;: &quot;flaxen&quot;, &quot;meaning&quot;: &quot;亚麻色的&quot;&#125; </span><br><span class="line"><span class="bullet">        -</span> 输出：&#123;&quot;word&quot;: &quot;flaxen&quot;, &quot;meaning&quot;: &quot;亚麻色的&quot;, &quot;promptEn&quot;: &quot;A linen-colored T-shirt.&quot;, &quot;promptZh&quot;: &quot;一件亚麻色的T恤。&quot;&#125;</span><br><span class="line"><span class="bullet">    -</span> 例子3：</span><br><span class="line"><span class="bullet">        -</span> 用户输入：&#123;&quot;word&quot;: &quot;dozens&quot;, &quot;meaning&quot;: &quot;n. 一打，许多&quot;&#125; </span><br><span class="line"><span class="bullet">        -</span> 输出：&#123;&quot;word&quot;: &quot;dozens&quot;, &quot;meaning&quot;: &quot;n. 一打，许多&quot;, &quot;promptEn&quot;: &quot;At a farmers’ market stall, several egg cartons are lined up, each holding 12 eggs. A price tag reads &quot;2 dozens for $4&quot; as a customer reaches out to select a carton. The scene highlights the everyday use of “dozens” to indicate quantity.&quot;, &quot;promptZh&quot;: &quot;在一个农贸市场摊位上，摆放着多个鸡蛋盒，每盒整齐排列着12个鸡蛋，旁边的价格标签上写着“2 dozens for $4”。有顾客正在挑选，画面体现出“按打出售”的日常生活场景。&quot;&#125;</span><br><span class="line"><span class="bullet">    -</span> 例子4：</span><br><span class="line"><span class="bullet">         -</span> 用户输入：&#123;&quot;word&quot;: &quot;dozens&quot;, &quot;meaning&quot;: &quot;n. 一打，许多&quot;&#125; </span><br><span class="line"><span class="bullet">         -</span> 输出：&#123;&quot;word&quot;: &quot;dozens&quot;, &quot;meaning&quot;: &quot;n. 一打，许多&quot;, &quot;promptEn&quot;: &quot;A small wooden cottage stands alone in a vast snowy field under a pale blue sky, with tall mountains far in the distance. The sense of isolation and distance from the nearest village evokes the feeling of being &#x27;far away from&#x27;.&quot;, &quot;promptZh&quot;: &quot;一间小木屋孤零零地矗立在广阔的雪原上，头顶是淡蓝色的天空，远处耸立着高山，最近的村庄则遥不可及，整个画面营造出“远离...”的感觉。&quot;&#125;</span><br><span class="line"><span class="section"># Initialization: 直接按上述要求开始处理用户输入。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-文本内容生成提示词"><a href="#2-3-文本内容生成提示词" class="headerlink" title="2.3 文本内容生成提示词"></a>2.3 文本内容生成提示词</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># Role: 专业英语学习卡片设计师</span></span><br><span class="line"><span class="section"># Background: 用户在英语学习过程中需要制作单词记忆卡片，以便更高效地记忆单词。他们希望卡片内容丰富，包括单词、词性、音标、核心含义、例句、词组搭配、单词的词根词缀解析和联想记忆文案，以帮助加深理解和记忆。</span></span><br><span class="line"><span class="section"># Profile: 你是一位资深的英语学习卡片设计师，拥有丰富的语言教学经验，同时也是精通英语词汇学和记忆心理学的专家，对英语词根词缀有着深入的研究和丰富的教学经验，擅长运用联想记忆法帮助学习者快速掌握单词。。</span></span><br><span class="line"><span class="section"># Skills: 你具备英语语言学、教育学的专业知识，能准确识别和解析单词的词根词缀，并运用联想记忆法将抽象的词根词缀转化为生动易记的意象或故事，提供出单词的词根词缀解析和联想记忆文案。并且还需提供单词的词性、音标、核心含义、例句、词组搭配等信息，以帮助学习者更好地理解和记忆单词。</span></span><br><span class="line"><span class="section"># Goals: 根据用户输入的英语单词，生成一张内容丰富单词记忆卡片，内容需包含单词、词性、音标、核心含义、例句、词组搭配、词根词缀解析、联想记忆文案，以帮助用户高效学习英语单词。</span></span><br><span class="line"><span class="section"># Constrains:</span></span><br><span class="line"><span class="bullet">    -</span> 输出的内容必须避免出现色情，暴力，血腥，反动，政治敏感相关内容；</span><br><span class="line"><span class="bullet">    -</span> 例句恰当，词组搭配恰当，根据具体的单词，词组搭配可以给出1到5个；</span><br><span class="line"><span class="bullet">    -</span> 生成的联想记忆文案应简洁明了，易于理解和记忆，避免过于复杂或晦涩的表达，确保适合不同英语水平的学习者；</span><br><span class="line"><span class="bullet">    -</span> 必须严格使用JSON格式响应，不需要使用<span class="code">```json ```</span>来包裹JSON字符串；</span><br><span class="line"><span class="bullet">    -</span> 保持输出内容JSON格式的正确性，不允许语法错误；</span><br><span class="line"><span class="section"># OutputFormat:</span></span><br><span class="line"><span class="bullet">    -</span> 输出结果应包含以下部分：单词、词性、音标、核心含义、例句、词组搭配、词根词缀解析、联想记忆文案。</span><br><span class="line"><span class="bullet">    -</span> 例句、词组搭配这三项需要同时给出英文文本的对应中文翻译。</span><br><span class="line"><span class="bullet">    -</span> 输出的结果应以json格式呈现，回答除了json文本外，请勿添加任何多余的字符；</span><br><span class="line"><span class="bullet">    -</span> json示例如下：&#123;&quot;mnemonic&quot;:&quot;xxx&quot;,&quot;word&quot;:&quot;xxx&quot;,&quot;word<span class="emphasis">_meaning&quot;:&quot;xxx&quot;,&quot;word_</span>phonetic&quot;:&quot;xxx&quot;,&quot;word<span class="emphasis">_class&quot;:&quot;xxx&quot;,&quot;word_</span>root<span class="emphasis">_mnemonic&quot;:&quot;xxx&quot;,&quot;word_</span>phrases&quot;:[&#123;&quot;meaning&quot;:&quot;xxx&quot;,&quot;phrase&quot;:&quot;xxx&quot;&#125;],&quot;word<span class="emphasis">_sentences&quot;:[&#123;&quot;sentence_</span>en&quot;:&quot;xxx&quot;,&quot;sentence<span class="emphasis">_zh&quot;:&quot;xxx&quot;&#125;]&#125;，json中mnemonic表示单词的联想记忆文案，word表示用户输入的英语单词或者短语，word_</span>meaning表示用户输入的单词中文释义，word<span class="emphasis">_phonetic表示生成的英语单词的国际音标，word_</span>class表示单词的词性，word<span class="emphasis">_root_</span>mnemonic表示单词的词根词缀解析，word<span class="emphasis">_phrases表示单词的词组搭配数组，数组中每一个元素表示一个单词的词组搭配，其中phrase表示具体的单词词组搭配的英文版本，meaning表示这个词组搭配的中文释义，word_</span>sentences表示单词的例句数组，数组中每一个元素表示一个单词的例句，其中sentence<span class="emphasis">_en表示单词例句的英文版本，sentence_</span>zh表示这个例句的中文翻译。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section"># Workflow:</span></span><br><span class="line"><span class="bullet">    1.</span> 用户会用json格式&#123;&quot;word&quot;: &quot;xxx&quot;, &quot;meaning&quot;: &quot;xxx&quot;&#125; 输入，json中word表示英语单词或短语，meaning表示单词或短语的中文释义；</span><br><span class="line"><span class="bullet">    2.</span> 解析json数据，明确用户输入的英语单词或短语，以及对应单词或者短语的中文释义；</span><br><span class="line"><span class="bullet">    3.</span> 给出单词的词性、音标、一个例句、一个或者多个词组搭配。</span><br><span class="line"><span class="bullet">    4.</span> 精确解析输入的英语单词，识别其词根和词缀，提供词根词缀解析。</span><br><span class="line"><span class="bullet">    5.</span> 根据词根词缀的含义，创造性地构建联想记忆文案。</span><br><span class="line"><span class="bullet">    6.</span> 例句、词组搭配这三项需要同时给出英文文本的对应中文翻译。</span><br><span class="line"><span class="bullet">    7.</span> 按照OutputFormat中指定的json格式输出结果。</span><br><span class="line"><span class="section"># Examples:</span></span><br><span class="line"><span class="bullet">    -</span> 例子1：</span><br><span class="line"><span class="bullet">        -</span> 用户输入：&#123;&quot;word&quot;: &quot;smirky&quot;, &quot;meaning&quot;: &quot;假笑的；傻笑的；得意地笑的&quot;&#125;</span><br><span class="line"><span class="bullet">        -</span> 输出：&#123;&quot;word&quot;:&quot;smirky&quot;,&quot;word<span class="emphasis">_meaning&quot;:&quot;假笑的；傻笑的；得意地笑的&quot;,&quot;word_</span>phonetic&quot;:&quot;/&#x27;smɜːkɪ/&quot;,&quot;word<span class="emphasis">_class&quot;:&quot;adj&quot;, &quot;mnemonic&quot;:&quot;smirky 就是那种让你莫名想翻白眼的笑，比笑而不语还讨人厌！&quot;,&quot;word_</span>root<span class="emphasis">_mnemonic&quot;:&quot;smirk（嘲笑，得意地笑）+ -y（形容词后缀，意为具有某种特征），因此，smirky意思是“表现出 smirk 特征的”，“带着得意或古怪笑容的”。&quot;,&quot;word_</span>phrases&quot;:[&#123;&quot;meaning&quot;:&quot;得意的笑容&quot;,&quot;phrase&quot;:&quot;smirky grin&quot;&#125;,&#123;&quot;meaning&quot;:&quot;嘲讽的语气&quot;,&quot;phrase&quot;:&quot;smirky tone&quot;&#125;],&quot;word<span class="emphasis">_sentences&quot;:[&#123;&quot;sentence_</span>en&quot;:&quot;He looked at us with a smirky grin, as if he knew something we had missed.&quot;,&quot;sentence<span class="emphasis">_zh&quot;:&quot;他带着令人讨厌的笑容看着我们，好像知道我们错过了什么。&quot;&#125;]&#125;</span></span><br><span class="line"><span class="emphasis">    - 例子2：</span></span><br><span class="line"><span class="emphasis">        - 用户输入：&#123;&quot;word&quot;: &quot;flaxen&quot;, &quot;meaning&quot;: &quot;亚麻色的，浅金色的&quot;&#125;</span></span><br><span class="line"><span class="emphasis">        - 输出：&#123;&quot;word&quot;:&quot;flaxen&quot;,&quot;word_</span>meaning&quot;:&quot;亚麻色的，浅金色的&quot;,&quot;word<span class="emphasis">_phonetic&quot;:&quot;/ˈflæksn/&quot;,&quot;word_</span>class&quot;:&quot;adj&quot;, &quot;mnemonic&quot;:&quot;把 flaxen 想象成“柔金色的亚麻纤维 🌾”织成的头发或布料，像阳光穿过麦田时那种淡淡的光泽。flax（亚麻）+ en（……的）= 像亚麻一样金黄柔软的，就是 flaxen！&quot;,&quot;word<span class="emphasis">_root_</span>mnemonic&quot;:&quot;词根 flax：亚麻（一种植物，用于纺织或榨油）,拉丁语 flāx，flācis = flax（亚麻）,词缀 -en：形容词后缀，表示“具有……性状的”,flax + -en = flaxen → “像亚麻一样的”，指外观和颜色。&quot;,&quot;word<span class="emphasis">_phrases&quot;:[&#123;&quot;meaning&quot;:&quot;亚麻色头发&quot;,&quot;phrase&quot;:&quot;flaxen hair&quot;&#125;,&#123;&quot;meaning&quot;:&quot;亚麻色光泽&quot;,&quot;phrase&quot;:&quot;flaxen sheen&quot;&#125;,&#123;&quot;meaning&quot;:&quot;像亚麻一样柔软&quot;,&quot;phrase&quot;:&quot;soft as flaxen fiber&quot;&#125;],&quot;word_</span>sentences&quot;:[&#123;&quot;sentence<span class="emphasis">_en&quot;:&quot;Her flaxen hair glistened in the sunlight.&quot;,&quot;sentence_</span>zh&quot;:&quot;她一头亚麻色的头发在阳光下闪闪发亮。&quot;&#125;]&#125;</span><br><span class="line"><span class="section"># Initialization: 直接按上述要求开始处理用户输入。</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="2-4-liblib文生图对接"><a href="#2-4-liblib文生图对接" class="headerlink" title="2.4 liblib文生图对接"></a>2.4 liblib文生图对接</h3><p>liblib底层是基于Stable Diffusion来实现文生图。生成过程可以使用 LoRA进行微调，比如我们想生成吉卜力风格的图片，就使用到了 liblib 中的<a target="_blank" rel="noopener" href="https://www.liblib.art/modelinfo/b117588baf1d4fd9a3da08954ca6c759?from=search&versionUuid=60cdd0badb844e039aa3cf0d9908f70e">吉卜力风格-完美替代GPT-4o</a>，经过多次调试，生成<code>644 x 920</code>的移动端适配的图片，使用下面的参数，成本可以控制在 ¥ 0.1 元一张。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">POST /api/generate/webui/text2img</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;templateUuid&quot;</span>: <span class="string">&quot;6f7c4652458d4802969f8d089cf5b91f&quot;</span>, // F.1文生图 参数模版 ID</span><br><span class="line">    <span class="string">&quot;generateParams&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;prompt&quot;</span>: <span class="string">&quot;Studio ghibli style, &#123;&#123;生图提示词&#125;&#125;&quot;</span>, // 正向提示词</span><br><span class="line">        <span class="string">&quot;negativePrompt&quot;</span>: <span class="string">&quot;ng_deepnegative_v1_75t,   (badhandv4:1.2),EasyNegative,(worst quality:2)&quot;</span>,   // 负向提示词（这里配置的是，提升画质，防止手部崩坏）</span><br><span class="line">        <span class="string">&quot;sampler&quot;</span>: 1,  // 采样方法，1是Euler</span><br><span class="line">        <span class="string">&quot;steps&quot;</span>: 25,   // 采样步数，逼近最终图像的迭代次数</span><br><span class="line">        <span class="string">&quot;cfgScale&quot;</span>: 4.5,  // 控制提示词对图像的影响程度</span><br><span class="line">        <span class="string">&quot;width&quot;</span>: 644,   // 宽</span><br><span class="line">        <span class="string">&quot;height&quot;</span>: 920,  // 高</span><br><span class="line">        <span class="string">&quot;imgCount&quot;</span>: 1,  // 生图数量</span><br><span class="line">        <span class="string">&quot;seed&quot;</span>: -1,    // 随机种子</span><br><span class="line">        // 参考的LoRA</span><br><span class="line">        <span class="string">&quot;additionalNetwork&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;modelId&quot;</span>: <span class="string">&quot;60cdd0badb844e039aa3cf0d9908f70e&quot;</span>,</span><br><span class="line">                <span class="string">&quot;weight&quot;</span>: 0.8  // LoRA权重</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-5-实现效果示例"><a href="#2-5-实现效果示例" class="headerlink" title="2.5 实现效果示例"></a>2.5 实现效果示例</h3><table>
+  <tr>
+    <td><img src="barber01.jpg" width="325" height="517"></td>
+    <td><img src="barber02.jpg" width="325" height="517"></td>
+  </tr>
+  <tr>
+    <td><img src="fall01.jpg" width="325" height="517"></td>
+    <td><img src="fall02.jpg" width="325" height="517"></td>
+  </tr>
+</table>
+
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://kiboroy.is-an.ai">kiboroy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://kiboroy.is-an.ai/2025/09/12/010-aigc-word-card/">https://kiboroy.is-an.ai/2025/09/12/010-aigc-word-card/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://kiboroy.is-an.ai" target="_blank">Kiboroy's Stack</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ai/">AI</a><a class="post-meta__tags" href="/tags/llm/">LLM</a><a class="post-meta__tags" href="/tags/aigc/">AIGC</a></div><div class="post-share"><div class="social-share" data-image="/images/my_avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/09/12/009-aigc-word-story/" title="009-AI内容生成--单词故事业务实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">009-AI内容生成--单词故事业务实践</div></div><div class="info-2"><div class="info-item-1">1. 需求背景课后复习环节引入AI能力，通过选择单词和故事风格，生成小故事的形式，辅助用户记忆单词。故事的文本需要包含中英文，并对英文文本中使用到的单词进行高亮，同时需要有有配套的英文文本对应的朗读音频。 2. 技术方案用户选择好若干个单词和故事风格，提交到后台，返回一个taskId，前端通过taskId去轮询后台的结果接口，当返回状态为text_done时，那么故事文本已生成，当返回状态为audio_done时，那么故事的音频已生成完毕。 故事的文本，调用的dify部署的agent生成，使用了gpt-4o模型；故事的音频，调用了微软的TTS服务，它们的英文语音合成，发音更为地道。 具体交互时序图如下： sequenceDiagram     actor user     participant front as APP客户端     participant stu as APP服务端     participant cache as 缓存     participant content as 内容服务后端     participant ai as LLM     partic...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/09/12/009-aigc-word-story/" title="009-AI内容生成--单词故事业务实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-12</div><div class="info-item-2">009-AI内容生成--单词故事业务实践</div></div><div class="info-2"><div class="info-item-1">1. 需求背景课后复习环节引入AI能力，通过选择单词和故事风格，生成小故事的形式，辅助用户记忆单词。故事的文本需要包含中英文，并对英文文本中使用到的单词进行高亮，同时需要有有配套的英文文本对应的朗读音频。 2. 技术方案用户选择好若干个单词和故事风格，提交到后台，返回一个taskId，前端通过taskId去轮询后台的结果接口，当返回状态为text_done时，那么故事文本已生成，当返回状态为audio_done时，那么故事的音频已生成完毕。 故事的文本，调用的dify部署的agent生成，使用了gpt-4o模型；故事的音频，调用了微软的TTS服务，它们的英文语音合成，发音更为地道。 具体交互时序图如下： sequenceDiagram     actor user     participant front as APP客户端     participant stu as APP服务端     participant cache as 缓存     participant content as 内容服务后端     participant ai as LLM     partic...</div></div></div></a><a class="pagination-related" href="/2025/05/10/004-how-to-write-prompt/" title="如何写好提示词"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-10</div><div class="info-item-2">如何写好提示词</div></div><div class="info-2"><div class="info-item-1">1. 原则1. 指令需要清晰、具体1. 使用分隔符例如，可以使用```&#123;text&#125;```，或者XML的标签来区分出指令内容和上下文背景内容； 2. 结构化输出可以要求模型以JSON或者HTML等格式内容输出； 3. 给出示例可以给出几个任务完成的结果示例，供模型参考； 4. 预设一些条件检查（可选）让模型执行的关键节点检查是否满足条件，来决定任务的执行路径； 2. 给模型时间去思考1. 列出任务步骤复杂的任务，最好将任务过程分步骤列出来； 2. 指导模型下结论前，自己先计算一次模型做决策之前，让模型自己先思考一遍解决方案，会得到更好的结果，否则模型给出的结论不一定准确； 3. 风险规避1. 模型“幻觉”模型可能编造看似真实的信息（如不存在的产品参数、错误的文献引用）。可在提示词中加入 “基于已知信息回答，若无法确认，明确说明，暂无相关数据”，或要求模型 “引用源文本中的内容作为支撑”，减少无根据的编造； 2. 避免指令冲突提示词中如果有相互矛盾的指令，模型会浪费大量资源去推理调和矛盾，甚至输出错误的结果；提示词撰写完成需要反复检查，确保逻辑一致，可以对指令设置...</div></div></div></a><a class="pagination-related" href="/2025/05/15/005-ai-interview-practice/" title="AI面试业务实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-15</div><div class="info-item-2">AI面试业务实践</div></div><div class="info-2"><div class="info-item-1">1. 需求背景单词学习教练的招聘分为两轮面试，一轮面试是对候选人的英语口语发音，单词词汇量的测试（使用语音评分服务以及自研的词汇量评测方案）；二轮面试是对候选人的教师职业素养能力的测试，分为自我介绍和职业素养开放性问答两个环节。 进入二面，会先播放一个单词学习教练的工作内容介绍视频，播放完毕进入自我介绍环节：  页面展示题目“请做一个自我介绍吧。“，并语音播放题目； 候选人点击录音按钮，开始作答，系统开始录音，并展示2 分钟的倒计时； 用户点击作答完成，或者倒计时结束，进入下一个环节；  职业素养问答环节：  职业素养题目分为 4 道题，候选人每回答完成一道题，就进入下一道题； 4 道题目作答完成，展示面试结果； 如果面试未通过，可以重新面试，一共两次机会；  2. 技术方案考虑到成本与用户体验之间的平衡；决定采用语音转文本 + 大语言模型评判的方式来完成二面面试的核心评判逻辑；考虑到代码的可扩展性和维护成本，采用策略模式+模版方法设计模式来组织代码逻辑； 1. 核心评判逻辑时序图sequenceDiagram     actor User     participant Fro...</div></div></div></a><a class="pagination-related" href="/2025/06/01/006-asr-similarity-practice/" title="AI语音识别 &amp;&amp; 自搭建语义相似度服务生产实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-01</div><div class="info-item-2">AI语音识别 &amp;&amp; 自搭建语义相似度服务生产实践</div></div><div class="info-2"><div class="info-item-1">1. 需求背景用户做英语单词记忆训练时，看着屏幕上的英语单词，点击录音按钮，念出单词的英语发音和中文意思，马上给出英语发音评分（具体到每个音素的评分）和中文翻译评分。 整个需求的难点在于：  整个过程中用户给到的音频是一英一中的连续发音，需要区分出英文发音的部分和中文释义的发音的部分，才能进行评分； 逻辑上能保证服务能区分出英文发音和中文释义发音后，还需要保证评分结果的快速响应；  2. 技术方案1. 流程拆解 客户端在麦克风接收到音频流后； 并行调用发音评估服务（获取英文发音评分）和语音识别服务（获取中文释义文本识别结果）； 获取到中文释义的文本识别结果后，再与原本的释义做语义相似度对比，得到中文翻译准确度的评分。  2. 分析调研2.1 发音评估发音评估部分，决定使用微软的发音评估服务。对于需求场景中的一英一中音频，指定语言为en-US，并使用脚本化评估的方式，将英文单词文本设置到ReferenceText参数中，就能准确对英语发音的部分给出准确性、流畅性、完整性、发音韵律四项评分。音频后面的中文发音部分不在ReferenceText中，一般会识别为插入内容，在评分返回值对象...</div></div></div></a><a class="pagination-related" href="/2025/06/06/007-dify-knowledge-base-practice/" title="Dify知识库实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-06</div><div class="info-item-2">Dify知识库实践</div></div><div class="info-2"><div class="info-item-1">1. 概述dify的知识库将RAG管线的各个环节可视化了，用户可以将企业内部文档、FAQ等内容上传到知识库进行结构化处理，后续供大模型查询。 2. 什么是RAGRAG( Retrieval Augmentation Generation) 检索增强生成，RAG做的事情就是帮助大模型临时性地获得它所不具备的外部知识，允许它在回答问题之前先找答案。  RAG中最核心的是外部知识的检索环节； 相比于微调，在达到相似效果时，RAG在成本效率和实时性能上具有显著优势。而微调对数据的质量和数量要求很高。并且应用程序在使用微调模型的时候可能也需要RAG技术的支持； 相比于长文本，大模型在处理长文本的场景下，文本越长，检索的准确度持续下降。大模型的长文本能力和RAG刚好可以完美结合，互相弥补不足； dify中的知识库实际就是，将文本进行分段之后转化为向量，当用户提出相关问题时，搜索的内容会转换成向量，然后在向量数据库中搜索最相似的向量，匹配最相似的几个上下文，最后将上下文组成的 prompt 一起提供给模型。  3. 数据准备参考：知识库数据分段模式 LLM 收到用户问题后，能否精准地回答出知识...</div></div></div></a><a class="pagination-related" href="/2025/08/20/008-claude-code-best-practice/" title="Claude Code实战经验"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-20</div><div class="info-item-2">Claude Code实战经验</div></div><div class="info-2"><div class="info-item-1">本文围绕 Claude Code 的核心能力与最佳实践展开，核心原则：人是开发的第一责任人，AI 是在人的授权与监督下辅助执行的任务智能伙伴，内容涵盖Claude Code核心功能与典型场景、最佳实践、实战经验与安全准则等。 1. 核心功能与典型场景Claude Code 可实现自然语言构建功能、代码调试修复、项目结构分析、自动化开发任务、直接编辑文件&#x2F;运行命令等能力，核心工作方式为终端对话式交互，支持文件编辑、命令执行、git 管理、项目上下文维护及外部 MCP 集成。 2.1 核心能力场景   能力类型 需求示例 执行逻辑    功能构建 Create a user authentication system 分析需求 → 制定方案 → 编写代码   调试修复 Fix the payment processing error 查看日志 → 定位问题 → 实现修复   代码库分析 Review this code for security issues 检查代码 → 识别漏洞 → 提出改进   自动化任务 Fix all lint issues in the proj...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">kiboroy</div><div class="author-info-description">Code, Cloud, and Curiosity</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/kiboroy"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/kiboroy" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:kilimanjaro.roy@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%9C%80%E6%B1%82%E8%83%8C%E6%99%AF"><span class="toc-text">1. 需求背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88"><span class="toc-text">2. 技术方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E4%BA%A4%E4%BA%92%E6%97%B6%E5%BA%8F%E5%9B%BE"><span class="toc-text">2.1 交互时序图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%94%9F%E5%9B%BE%E6%8F%90%E7%A4%BA%E8%AF%8D"><span class="toc-text">2.2 生图提示词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E6%96%87%E6%9C%AC%E5%86%85%E5%AE%B9%E7%94%9F%E6%88%90%E6%8F%90%E7%A4%BA%E8%AF%8D"><span class="toc-text">2.3 文本内容生成提示词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-liblib%E6%96%87%E7%94%9F%E5%9B%BE%E5%AF%B9%E6%8E%A5"><span class="toc-text">2.4 liblib文生图对接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E5%AE%9E%E7%8E%B0%E6%95%88%E6%9E%9C%E7%A4%BA%E4%BE%8B"><span class="toc-text">2.5 实现效果示例</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/12/010-aigc-word-card/" title="010-AI内容生成--单词卡片业务实践">010-AI内容生成--单词卡片业务实践</a><time datetime="2025-09-12T14:32:56.000Z" title="发表于 2025-09-12 22:32:56">2025-09-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/12/009-aigc-word-story/" title="009-AI内容生成--单词故事业务实践">009-AI内容生成--单词故事业务实践</a><time datetime="2025-09-12T14:14:24.000Z" title="发表于 2025-09-12 22:14:24">2025-09-12</time></div></div></div></div></div></div></main><footer id="footer" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By kiboroy</span></div><div class="footer_custom_text">welcome to my blog</div><script type="text/javascript" id="maid-script" src="https://unpkg.com/mermaid@9.0.0/dist/mermaid.min.js?v=undefined"></script><script>if (window.mermaid) {
+  var options = JSON.parse(document.getElementById('maid-script').getAttribute('mermaidoptioins'));
+  mermaid.initialize(options);
+}</script></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://unpkg.com/mermaid@9.0.0/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
