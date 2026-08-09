@@ -186,6 +186,7 @@
 <li>修改sql，<code>order by</code>条件最前面增加字段<code>lesson_date</code>，<code>index_lesson_date</code>索引后面再加start_time和id –&gt; <code>(use_point,lesson_date,start_time,id)</code>，实际业务语义是无变化的，而且不会有<code>using file sort</code>；</li>
 </ol>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> class_info <span class="keyword">WHERE</span> (use_point <span class="operator">=</span> <span class="string">&#x27;buy&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&gt;=</span> <span class="string">&#x27;2026-03-01&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&lt;=</span> <span class="string">&#x27;2026-03-31&#x27;</span>) <span class="keyword">ORDER</span> <span class="keyword">BY</span> lesson_date, start_time, id LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="/2025/08/07/011-mysql-chosen-wrong-index/new-explain-plan.png" alt="图片3"></p>
 <ol start="3">
 <li><code>index_add_time</code>索引，业务上有使用到，不太好删除；</li>
 </ol>
