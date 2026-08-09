@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Mysql上sql执行为何选错索引 | Kiboroy's Stack</title><meta name="author" content="kiboroy,kilimanjaro.roy@gmail.com"><meta name="copyright" content="kiboroy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1、问题缘起生产环境阿里云PolarDB-Mysql的慢日志查看到，用户课程记录表，class_info表中的分页查询sql执行时间将近5s， 1SELECT * FROM class_info WHERE (use_point &#x3D; &#x27;buy&#x27; AND lesson_date &gt;&#x3D; &#x27;2025-03-01&#x27; AND lesson_date &lt;&#x3D;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql上sql执行为何选错索引">
+<meta property="og:url" content="https://kiboroy.is-an.ai/2025/08/07/011-mysql-chosen-wrong-index/index.html">
+<meta property="og:site_name" content="Kiboroy&#39;s Stack">
+<meta property="og:description" content="1、问题缘起生产环境阿里云PolarDB-Mysql的慢日志查看到，用户课程记录表，class_info表中的分页查询sql执行时间将近5s， 1SELECT * FROM class_info WHERE (use_point &#x3D; &#x27;buy&#x27; AND lesson_date &gt;&#x3D; &#x27;2025-03-01&#x27; AND lesson_date &lt;&#x3D;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://kiboroy.is-an.ai/images/my_avatar.jpeg">
+<meta property="article:published_time" content="2025-08-07T14:48:53.000Z">
+<meta property="article:modified_time" content="2025-08-07T15:26:12.000Z">
+<meta property="article:author" content="kiboroy">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kiboroy.is-an.ai/images/my_avatar.jpeg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Mysql上sql执行为何选错索引",
+  "url": "https://kiboroy.is-an.ai/2025/08/07/011-mysql-chosen-wrong-index/",
+  "image": "https://kiboroy.is-an.ai/images/my_avatar.jpeg",
+  "datePublished": "2025-08-07T14:48:53.000Z",
+  "dateModified": "2025-08-07T15:26:12.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "kiboroy",
+      "url": "https://kiboroy.is-an.ai"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/snow-mount-line.png"><link rel="canonical" href="https://kiboroy.is-an.ai/2025/08/07/011-mysql-chosen-wrong-index/index.html"><link rel="preconnect" href="//cdnjs.cloudflare.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdnjs.cloudflare.com/ajax/libs/egjs-infinitegrid/4.12.0/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Mysql上sql执行为何选错索引',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Kiboroy's Stack</span></a><a class="nav-page-title" href="/"><span class="site-name">Mysql上sql执行为何选错索引</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Mysql上sql执行为何选错索引</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-08-07T14:48:53.000Z" title="发表于 2025-08-07 22:48:53">2025-08-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-08-07T15:26:12.000Z" title="更新于 2025-08-07 23:26:12">2025-08-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/mysql/">Mysql</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h3 id="1、问题缘起"><a href="#1、问题缘起" class="headerlink" title="1、问题缘起"></a>1、问题缘起</h3><p>生产环境阿里云PolarDB-Mysql的慢日志查看到，用户课程记录表，class_info表中的分页查询sql执行时间将近5s，</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> class_info <span class="keyword">WHERE</span> (use_point <span class="operator">=</span> <span class="string">&#x27;buy&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&gt;=</span> <span class="string">&#x27;2025-03-01&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&lt;=</span> <span class="string">&#x27;2025-03-31&#x27;</span>) <span class="keyword">ORDER</span> <span class="keyword">BY</span> start_time <span class="keyword">ASC</span>,id <span class="keyword">ASC</span> LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>可以看到该sql查询逻辑并不复杂，就是个简单的条件查询后再排序分页，并且表中也有索引<code>index_lesson_date(use_point,lesson_date)</code>，按理也是会正常走索引，为什么会查询如此之慢呢？</p>
+<h3 id="2、排查过程"><a href="#2、排查过程" class="headerlink" title="2、排查过程"></a>2、排查过程</h3><p>因为本身有索引，所以第一时间是怀疑服务实例负载过高导致的，查看了实例状态监控，并无异常。于是登录到从库实例，执行了这个问题sql，一样是执行时间将近5s，这个情况的话，马上使用<code>explain</code>命令查看sql的执行计划，发现执行计划中使用的索引并不是<code>index_lesson_date(use_point,lesson_date)</code>，而是<code>index_add_time(use_point,add_time)</code>，这个结果一时令人费解。<br><img src="/2025/08/07/011-mysql-chosen-wrong-index/explain-plan.png" alt="执行计划图片"><br>sql的where条件明明白白，为什么执行过程中没有使用<code>index_lesson_date(use_point,lesson_date)</code>这个正正好的索引，而是用了这个看起来毫不相干的<code>index_add_time(use_point,add_time)</code>，带着疑问，修改了一下sql语句，强制指定了查询使用的索引，执行了一下，700ms返回了结果。那么我们现在可以<strong>明确做出结论，Mysql在执行这个查询sql时选错了索引</strong>。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> class_info force index (index_lesson_date) <span class="keyword">WHERE</span> (use_point <span class="operator">=</span> <span class="string">&#x27;buy&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&gt;=</span> <span class="string">&#x27;2026-03-01&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&lt;=</span> <span class="string">&#x27;2026-03-31&#x27;</span>) <span class="keyword">ORDER</span> <span class="keyword">BY</span> start_time <span class="keyword">ASC</span>,id <span class="keyword">ASC</span> LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我们知道索引选择是由Mysql的优化器做的，优化器选择索引的工作，会通过扫描行数、是否使用临时表、是否排序等因素进行综合判断。所以来查看一下这个查询sql详细的<code>OPTIMIZER_TRACE</code>。</p>
+<p>1、发现在<code>analyzing_range_alternatives</code>范围查询分析过程中，优化器认为<code>index_lesson_date(use_point,lesson_date)</code>和<code>index_add_time(use_point,add_time)</code>两个索引都要扫描40W+行，优化器都没有选择。<br><img src="/2025/08/07/011-mysql-chosen-wrong-index/range_analysis.png" alt="图片1"></p>
+<p>2、在<code>considered_excution_plans</code>考虑的执行计划中，优化器判断<code>index_add_time(use_point,add_time)</code>索引需要扫描16w行，而<code>index_lesson_date(use_point,lesson_date)</code>索引需要扫描24w行，最终优化器选择了索引<code>index_add_time(use_point,add_time)</code>。但使用这个索引，完全起不到缩小数据集范围的效果，执行时会每扫描一条数据就回表读取数据，看lesson_date是否落在where条件内，收集完所有符合要求的数据，再在内存中排序，自然慢到不行。<br><img src="/2025/08/07/011-mysql-chosen-wrong-index/considered-plan.png" alt="图片2"></p>
+<p>那么现在问题关键就在于，为什么优化器认为<code>index_add_time(use_point,add_time)</code>索引会比<code>index_lesson_date(use_point,lesson_date)</code>索引扫描的行数少？<br>mysql在sql实际执行之前，执行计划中的这个扫描行数是估算出来的，并不一定是实际的情况，它这个估算是通过一个采样方法估算的，每次更新一定量的数据时，会更新每个索引的这个统计数值。<br>而在<code>class_info</code>表中<code>use_point</code>字段的数据，极不均匀，将近88%的数据都是<code>use_point=&#39;buy&#39;</code>的数据。</p>
+<ul>
+<li><code>index_lesson_date(use_point,lesson_date)</code>索引，<code>lesson_date</code>是上课日期，数据按照 <code>use_point + 日期</code>分散插入，采样时可能恰好扫到很多都是<code>use_point=&#39;buy&#39;</code>的page，导致估算基数 ≈ 1（全是<code>use_point= &#39;buy&#39;</code>），因此优化器的估算行数<code>rows=80W+</code>；</li>
+<li><code>index_add_time(use_point,add_time)</code>索引，<code>add_time</code>是记录创建时间，通常单调递增，数据分布可能更均匀，采样时可能扫到了<code>use_point=&#39;buy&#39;</code>和<code>use_point=&#39;buy&#39;</code>混合的page，估算基数 ≈ 2，因此优化器的估算行数<code>rows=40W+</code>；</li>
+</ul>
+<p>综上，这个查询sql执行的时候选错索引的根本原因就在于，<code>use_point</code>的索引，建的不好，数据区分度不高。</p>
+<h3 id="3、解决方案"><a href="#3、解决方案" class="headerlink" title="3、解决方案"></a>3、解决方案</h3><p>mysql查询索引选错，一般3个办法处理：</p>
+<ol>
+<li>查询语句用force index强制指定索引；</li>
+<li>修改sql语句，引导mysql使用我们期望的索引；</li>
+<li>新建一个更加合适的索引，或者删掉某些索引；</li>
+</ol>
+<p>对应我们这个场景:</p>
+<ol>
+<li>强制指定索引为<code>index_lesson_date(use_point,lesson_date)</code>，执行时长约700ms上下，但是还是会<code>using file sort</code>；</li>
+<li>修改sql，<code>order by</code>条件最前面增加字段<code>lesson_date</code>，<code>index_lesson_date</code>索引后面再加start_time和id –&gt; <code>(use_point,lesson_date,start_time,id)</code>，实际业务语义是无变化的，而且不会有<code>using file sort</code>；</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> class_info <span class="keyword">WHERE</span> (use_point <span class="operator">=</span> <span class="string">&#x27;buy&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&gt;=</span> <span class="string">&#x27;2026-03-01&#x27;</span> <span class="keyword">AND</span> lesson_date <span class="operator">&lt;=</span> <span class="string">&#x27;2026-03-31&#x27;</span>) <span class="keyword">ORDER</span> <span class="keyword">BY</span> lesson_date, start_time, id LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><code>index_add_time</code>索引，业务上有使用到，不太好删除；</li>
+</ol>
+<p>最终选择方案二解决问题。不过远期来看，<code>class_info</code>表的索引，有一些建的确实不合理，待后面全盘整理再优化。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://kiboroy.is-an.ai">kiboroy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://kiboroy.is-an.ai/2025/08/07/011-mysql-chosen-wrong-index/">https://kiboroy.is-an.ai/2025/08/07/011-mysql-chosen-wrong-index/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://kiboroy.is-an.ai" target="_blank">Kiboroy's Stack</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mysql/">Mysql</a></div><div class="post-share"><div class="social-share" data-image="/images/my_avatar.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/09/12/009-aigc-word-story/" title="AI内容生成--单词故事业务实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">AI内容生成--单词故事业务实践</div></div><div class="info-2"><div class="info-item-1">1. 需求背景课后复习环节引入AI能力，通过选择单词和故事风格，生成小故事的形式，辅助用户记忆单词。故事的文本需要包含中英文，并对英文文本中使用到的单词进行高亮，同时需要有有配套的英文文本对应的朗读音频。 2. 技术方案用户选择好若干个单词和故事风格，提交到后台，返回一个taskId，前端通过taskId去轮询后台的结果接口，当返回状态为text_done时，那么故事文本已生成，当返回状态为audio_done时，那么故事的音频已生成完毕。 故事的文本，调用的dify部署的agent生成，使用了gpt-4o模型；故事的音频，调用了微软的TTS服务，它们的英文语音合成，发音更为地道。 具体交互时序图如下： sequenceDiagram     actor user     participant front as APP客户端     participant stu as APP服务端     participant cache as 缓存     participant content as 内容服务后端     participant ai as LLM     partic...</div></div></div></a><a class="pagination-related" href="/2025/06/06/007-dify-knowledge-base-practice/" title="Dify知识库实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Dify知识库实践</div></div><div class="info-2"><div class="info-item-1">1. 概述dify的知识库将RAG管线的各个环节可视化了，用户可以将企业内部文档、FAQ等内容上传到知识库进行结构化处理，后续供大模型查询。 2. 什么是RAGRAG( Retrieval Augmentation Generation) 检索增强生成，RAG做的事情就是帮助大模型临时性地获得它所不具备的外部知识，允许它在回答问题之前先找答案。  RAG中最核心的是外部知识的检索环节； 相比于微调，在达到相似效果时，RAG在成本效率和实时性能上具有显著优势。而微调对数据的质量和数量要求很高。并且应用程序在使用微调模型的时候可能也需要RAG技术的支持； 相比于长文本，大模型在处理长文本的场景下，文本越长，检索的准确度持续下降。大模型的长文本能力和RAG刚好可以完美结合，互相弥补不足； dify中的知识库实际就是，将文本进行分段之后转化为向量，当用户提出相关问题时，搜索的内容会转换成向量，然后在向量数据库中搜索最相似的向量，匹配最相似的几个上下文，最后将上下文组成的 prompt 一起提供给模型。  3. 数据准备参考：知识库数据分段模式 LLM 收到用户问题后，能否精准地回答出知识...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/my_avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">kiboroy</div><div class="author-info-description">Code, Cloud, and Curiosity</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/kiboroy"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/kiboroy" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:kilimanjaro.roy@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E9%97%AE%E9%A2%98%E7%BC%98%E8%B5%B7"><span class="toc-text">1、问题缘起</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E6%8E%92%E6%9F%A5%E8%BF%87%E7%A8%8B"><span class="toc-text">2、排查过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">3、解决方案</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/20/008-claude-code-best-practice/" title="Claude Code实战经验">Claude Code实战经验</a><time datetime="2025-10-20T13:36:04.000Z" title="发表于 2025-10-20 21:36:04">2025-10-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/12/010-aigc-word-card/" title="AI内容生成--单词卡片业务实践">AI内容生成--单词卡片业务实践</a><time datetime="2025-09-12T14:32:56.000Z" title="发表于 2025-09-12 22:32:56">2025-09-12</time></div></div></div></div></div></div></main><footer id="footer" style="background: linear-gradient(20deg, #0062be, #925696, #cc426e, #fb0347);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By kiboroy</span></div><div class="footer_custom_text">welcome to my blog</div><script type="text/javascript" id="maid-script" src="https://unpkg.com/mermaid@9.0.0/dist/mermaid.min.js?v=undefined"></script><script>if (window.mermaid) {
+  var options = JSON.parse(document.getElementById('maid-script').getAttribute('mermaidoptioins'));
+  mermaid.initialize(options);
+}</script></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://unpkg.com/mermaid@9.0.0/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
